@@ -1,0 +1,437 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "azurerm"
+      version = "4.24.0"
+    }
+  }
+}
+provider "azurerm" {
+  features {}
+}
+resource "azurerm_resource_group" "res-0" {
+  location   = "westeurope"
+   name       = "s1190828"
+  tags       = {}
+}
+resource "azurerm_linux_virtual_machine" "res-1" {
+  admin_password                                         = "" # Masked sensitive attribute
+  admin_username                                         = "student"
+  allow_extension_operations                             = true
+  availability_set_id                                    = ""
+  bypass_platform_safety_checks_on_user_schedule_enabled = false
+  capacity_reservation_group_id                          = ""
+  computer_name                                          = "SSC-APP-VM0"
+  custom_data                                            = "" # Masked sensitive attribute
+  dedicated_host_group_id                                = ""
+  dedicated_host_id                                      = ""
+  disable_password_authentication                        = false
+  disk_controller_type                                   = "SCSI"
+  edge_zone                                              = ""
+  encryption_at_host_enabled                             = false
+  eviction_policy                                        = ""
+  extensions_time_budget                                 = "PT1H30M"
+  license_type                                           = ""
+  location                                               = "westeurope"
+  max_bid_price                                          = -1
+  name                                                   = "SSC-APP-VM0"
+  network_interface_ids                                  = ["/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/networkInterfaces/SSC-APP-NIC-0"]
+  patch_assessment_mode                                  = "ImageDefault"
+  patch_mode                                             = "ImageDefault"
+  platform_fault_domain                                  = -1
+  priority                                               = "Regular"
+  provision_vm_agent                                     = true
+  proximity_placement_group_id                           = ""
+  reboot_setting                                         = ""
+  resource_group_name                                    = "s1190828"
+  secure_boot_enabled                                    = false
+  size                                                   = "Standard_B2ats_v2"
+  source_image_id                                        = ""
+  tags                                                   = {}
+  user_data                                              = ""
+  virtual_machine_scale_set_id                           = ""
+  vm_agent_platform_updates_enabled                      = false
+  vtpm_enabled                                           = false
+  zone                                                   = ""
+  admin_ssh_key {
+    public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL58jaxD3fXQPm5zm7KdRJ0vMFsC1a/BnCtDgspeCbwg student@s1190828-ubuntu\n"
+    username   = "student"
+  }
+  os_disk {
+    caching                          = "ReadWrite"
+    disk_encryption_set_id           = ""
+    disk_size_gb                     = 30
+    name                             = "SSC-APP-VM0_OsDisk_1_0f8d3ca2dd404209ba68b30955715c79"
+    secure_vm_disk_encryption_set_id = ""
+    security_encryption_type         = ""
+    storage_account_type             = "Standard_LRS"
+    write_accelerator_enabled        = false
+  }
+  source_image_reference {
+    offer     = "ubuntu-24_04-lts"
+    publisher = "Canonical"
+    sku       = "server"
+    version   = "latest"
+  }
+  depends_on = [
+    azurerm_network_interface.res-5,
+  ]
+}
+resource "azurerm_linux_virtual_machine" "res-2" {
+  admin_password                                         = "" # Masked sensitive attribute
+  admin_username                                         = "student"
+  allow_extension_operations                             = true
+  availability_set_id                                    = ""
+  bypass_platform_safety_checks_on_user_schedule_enabled = false
+  capacity_reservation_group_id                          = ""
+  computer_name                                          = "SSC-DB-VM0"
+  custom_data                                            = "" # Masked sensitive attribute
+  dedicated_host_group_id                                = ""
+  dedicated_host_id                                      = ""
+  disable_password_authentication                        = false
+  disk_controller_type                                   = "SCSI"
+  edge_zone                                              = ""
+  encryption_at_host_enabled                             = false
+  eviction_policy                                        = ""
+  extensions_time_budget                                 = "PT1H30M"
+  license_type                                           = ""
+  location                                               = "westeurope"
+  max_bid_price                                          = -1
+  name                                                   = "SSC-DB-VM0"
+  network_interface_ids                                  = ["/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/networkInterfaces/SSC-DB-NIC-0"]
+  patch_assessment_mode                                  = "ImageDefault"
+  patch_mode                                             = "ImageDefault"
+  platform_fault_domain                                  = -1
+  priority                                               = "Regular"
+  provision_vm_agent                                     = true
+  proximity_placement_group_id                           = ""
+  reboot_setting                                         = ""
+  resource_group_name                                    = "s1190828"
+  secure_boot_enabled                                    = false
+  size                                                   = "Standard_B2ats_v2"
+  source_image_id                                        = ""
+  tags                                                   = {}
+  user_data                                              = ""
+  virtual_machine_scale_set_id                           = ""
+  vm_agent_platform_updates_enabled                      = false
+  vtpm_enabled                                           = false
+  zone                                                   = ""
+  admin_ssh_key {
+    public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL58jaxD3fXQPm5zm7KdRJ0vMFsC1a/BnCtDgspeCbwg student@s1190828-ubuntu\n"
+    username   = "student"
+  }
+  os_disk {
+    caching                          = "ReadWrite"
+    disk_encryption_set_id           = ""
+    disk_size_gb                     = 30
+    name                             = "SSC-DB-VM0_OsDisk_1_6fd6f2377f7944aea473e7b746cc3944"
+    secure_vm_disk_encryption_set_id = ""
+    security_encryption_type         = ""
+    storage_account_type             = "Standard_LRS"
+    write_accelerator_enabled        = false
+  }
+  source_image_reference {
+    offer     = "ubuntu-24_04-lts"
+    publisher = "Canonical"
+    sku       = "server"
+    version   = "latest"
+  }
+  depends_on = [
+    azurerm_network_interface.res-6,
+  ]
+}
+resource "azurerm_linux_virtual_machine" "res-3" {
+  admin_password                                         = "" # Masked sensitive attribute
+  admin_username                                         = "student"
+  allow_extension_operations                             = true
+  availability_set_id                                    = ""
+  bypass_platform_safety_checks_on_user_schedule_enabled = false
+  capacity_reservation_group_id                          = ""
+  computer_name                                          = "SSC-WEB-VM0"
+  custom_data                                            = "" # Masked sensitive attribute
+  dedicated_host_group_id                                = ""
+  dedicated_host_id                                      = ""
+  disable_password_authentication                        = false
+  disk_controller_type                                   = "SCSI"
+  edge_zone                                              = ""
+  encryption_at_host_enabled                             = false
+  eviction_policy                                        = ""
+  extensions_time_budget                                 = "PT1H30M"
+  license_type                                           = ""
+  location                                               = "westeurope"
+  max_bid_price                                          = -1
+  name                                                   = "SSC-WEB-VM0"
+  network_interface_ids                                  = ["/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/networkInterfaces/SSC-WEB-NIC-0"]
+  patch_assessment_mode                                  = "ImageDefault"
+  patch_mode                                             = "ImageDefault"
+  platform_fault_domain                                  = -1
+  priority                                               = "Regular"
+  provision_vm_agent                                     = true
+  proximity_placement_group_id                           = ""
+  reboot_setting                                         = ""
+  resource_group_name                                    = "s1190828"
+  secure_boot_enabled                                    = false
+  size                                                   = "Standard_B2ats_v2"
+  source_image_id                                        = ""
+  tags                                                   = {}
+  user_data                                              = ""
+  virtual_machine_scale_set_id                           = ""
+  vm_agent_platform_updates_enabled                      = false
+  vtpm_enabled                                           = false
+  zone                                                   = ""
+  admin_ssh_key {
+    public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL58jaxD3fXQPm5zm7KdRJ0vMFsC1a/BnCtDgspeCbwg student@s1190828-ubuntu\n"
+    username   = "student"
+  }
+  os_disk {
+    caching                          = "ReadWrite"
+    disk_encryption_set_id           = ""
+    disk_size_gb                     = 30
+    name                             = "SSC-WEB-VM0_OsDisk_1_bd3e37e155ad40029b0760193908acd3"
+    secure_vm_disk_encryption_set_id = ""
+    security_encryption_type         = ""
+    storage_account_type             = "Standard_LRS"
+    write_accelerator_enabled        = false
+  }
+  source_image_reference {
+    offer     = "ubuntu-24_04-lts"
+    publisher = "Canonical"
+    sku       = "server"
+    version   = "latest"
+  }
+  depends_on = [
+    azurerm_network_interface.res-7,
+  ]
+}
+resource "azurerm_application_security_group" "res-4" {
+  location            = "westeurope"
+  name                = "SSC-WEB-ASG"
+  resource_group_name = "s1190828"
+  tags                = {}
+  depends_on = [
+    azurerm_resource_group.res-0,
+  ]
+}
+resource "azurerm_network_interface" "res-5" {
+  accelerated_networking_enabled = false
+  auxiliary_mode                 = ""
+  auxiliary_sku                  = ""
+  dns_servers                    = []
+  edge_zone                      = ""
+  internal_dns_name_label        = ""
+  ip_forwarding_enabled          = false
+  location                       = "westeurope"
+  name                           = "SSC-APP-NIC-0"
+  resource_group_name            = "s1190828"
+  tags                           = {}
+  ip_configuration {
+    gateway_load_balancer_frontend_ip_configuration_id = ""
+    name                                               = "internal"
+    primary                                            = true
+    private_ip_address                                 = "10.0.2.4"
+    private_ip_address_allocation                      = "Dynamic"
+    private_ip_address_version                         = "IPv4"
+    public_ip_address_id                               = ""
+    subnet_id                                          = "/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/virtualNetworks/IAC-vnet/subnets/SSC-APP"
+  }
+  depends_on = [
+    azurerm_subnet.res-11,
+  ]
+}
+resource "azurerm_network_interface" "res-6" {
+  accelerated_networking_enabled = false
+  auxiliary_mode                 = ""
+  auxiliary_sku                  = ""
+  dns_servers                    = []
+  edge_zone                      = ""
+  internal_dns_name_label        = ""
+  ip_forwarding_enabled          = false
+  location                       = "westeurope"
+  name                           = "SSC-DB-NIC-0"
+  resource_group_name            = "s1190828"
+  tags                           = {}
+  ip_configuration {
+    gateway_load_balancer_frontend_ip_configuration_id = ""
+    name                                               = "internal"
+    primary                                            = true
+    private_ip_address                                 = "10.0.3.4"
+    private_ip_address_allocation                      = "Dynamic"
+    private_ip_address_version                         = "IPv4"
+    public_ip_address_id                               = ""
+    subnet_id                                          = "/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/virtualNetworks/IAC-vnet/subnets/SSC-DB"
+  }
+  depends_on = [
+    azurerm_subnet.res-12,
+  ]
+}
+resource "azurerm_network_interface" "res-7" {
+  accelerated_networking_enabled = false
+  auxiliary_mode                 = ""
+  auxiliary_sku                  = ""
+  dns_servers                    = []
+  edge_zone                      = ""
+  internal_dns_name_label        = ""
+  ip_forwarding_enabled          = false
+  location                       = "westeurope"
+  name                           = "SSC-WEB-NIC-0"
+  resource_group_name            = "s1190828"
+  tags                           = {}
+  ip_configuration {
+    gateway_load_balancer_frontend_ip_configuration_id = ""
+    name                                               = "internal"
+    primary                                            = true
+    private_ip_address                                 = "10.0.1.4"
+    private_ip_address_allocation                      = "Dynamic"
+    private_ip_address_version                         = "IPv4"
+    public_ip_address_id                               = ""
+    subnet_id                                          = "/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/virtualNetworks/IAC-vnet/subnets/SSC-WEB"
+  }
+  depends_on = [
+    azurerm_subnet.res-13,
+  ]
+}
+resource "azurerm_network_security_group" "res-8" {
+  location            = "westeurope"
+  name                = "SSC-WEB-NSG"
+  resource_group_name = "s1190828"
+  security_rule = [{
+    access                                     = "Allow"
+    description                                = ""
+    destination_address_prefix                 = "*"
+    destination_address_prefixes               = []
+    destination_application_security_group_ids = []
+    destination_port_range                     = "8080"
+    destination_port_ranges                    = []
+    direction                                  = "Inbound"
+    name                                       = "AllowApplicationSecurityGroupCustom8080Inbound"
+    priority                                   = 100
+    protocol                                   = "Tcp"
+    source_address_prefix                      = ""
+    source_address_prefixes                    = []
+    source_application_security_group_ids      = ["/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/applicationSecurityGroups/SSC-WEB-ASG"]
+    source_port_range                          = "*"
+    source_port_ranges                         = []
+  }]
+  tags = {}
+  depends_on = [
+    azurerm_application_security_group.res-4,
+  ]
+}
+resource "azurerm_network_security_rule" "res-9" {
+  access                                     = "Allow"
+  description                                = ""
+  destination_address_prefix                 = "*"
+  destination_address_prefixes               = []
+  destination_application_security_group_ids = []
+  destination_port_range                     = "8080"
+  destination_port_ranges                    = []
+  direction                                  = "Inbound"
+  name                                       = "AllowApplicationSecurityGroupCustom8080Inbound"
+  network_security_group_name                = "SSC-WEB-NSG"
+  priority                                   = 100
+  protocol                                   = "Tcp"
+  resource_group_name                        = "s1190828"
+  source_address_prefix                      = ""
+  source_address_prefixes                    = []
+  source_application_security_group_ids      = ["/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/applicationSecurityGroups/SSC-WEB-ASG"]
+  source_port_range                          = "*"
+  source_port_ranges                         = []
+  depends_on = [
+    azurerm_application_security_group.res-4,
+    azurerm_network_security_group.res-8,
+  ]
+}
+resource "azurerm_virtual_network" "res-10" {
+  address_space                  = ["10.0.0.0/16"]
+  bgp_community                  = ""
+  dns_servers                    = []
+  edge_zone                      = ""
+  flow_timeout_in_minutes        = 0
+  location                       = "westeurope"
+  name                           = "IAC-vnet"
+  private_endpoint_vnet_policies = "Disabled"
+  resource_group_name            = "s1190828"
+  subnet = [{
+    address_prefixes                              = ["10.0.1.0/24"]
+    default_outbound_access_enabled               = true
+    delegation                                    = []
+    id                                            = "/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/virtualNetworks/IAC-vnet/subnets/SSC-WEB"
+    name                                          = "SSC-WEB"
+    private_endpoint_network_policies             = "Disabled"
+    private_link_service_network_policies_enabled = true
+    route_table_id                                = ""
+    security_group                                = ""
+    service_endpoint_policy_ids                   = []
+    service_endpoints                             = []
+    }, {
+    address_prefixes                              = ["10.0.2.0/24"]
+    default_outbound_access_enabled               = true
+    delegation                                    = []
+    id                                            = "/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/virtualNetworks/IAC-vnet/subnets/SSC-APP"
+    name                                          = "SSC-APP"
+    private_endpoint_network_policies             = "Disabled"
+    private_link_service_network_policies_enabled = true
+    route_table_id                                = ""
+    security_group                                = ""
+    service_endpoint_policy_ids                   = []
+    service_endpoints                             = []
+    }, {
+    address_prefixes                              = ["10.0.3.0/24"]
+    default_outbound_access_enabled               = true
+    delegation                                    = []
+    id                                            = "/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/virtualNetworks/IAC-vnet/subnets/SSC-DB"
+    name                                          = "SSC-DB"
+    private_endpoint_network_policies             = "Disabled"
+    private_link_service_network_policies_enabled = true
+    route_table_id                                = ""
+    security_group                                = ""
+    service_endpoint_policy_ids                   = []
+    service_endpoints                             = []
+  }]
+  tags = {}
+  depends_on = [
+    azurerm_resource_group.res-0,
+  ]
+}
+resource "azurerm_subnet" "res-11" {
+  address_prefixes                              = ["10.0.2.0/24"]
+  default_outbound_access_enabled               = true
+  name                                          = "SSC-APP"
+  private_endpoint_network_policies             = "Disabled"
+  private_link_service_network_policies_enabled = true
+  resource_group_name                           = "s1190828"
+  service_endpoint_policy_ids                   = []
+  service_endpoints                             = []
+  virtual_network_name                          = "IAC-vnet"
+  depends_on = [
+    azurerm_virtual_network.res-10,
+  ]
+}
+resource "azurerm_subnet" "res-12" {
+  address_prefixes                              = ["10.0.3.0/24"]
+  default_outbound_access_enabled               = true
+  name                                          = "SSC-DB"
+  private_endpoint_network_policies             = "Disabled"
+  private_link_service_network_policies_enabled = true
+  resource_group_name                           = "s1190828"
+  service_endpoint_policy_ids                   = []
+  service_endpoints                             = []
+  virtual_network_name                          = "IAC-vnet"
+  depends_on = [
+    azurerm_virtual_network.res-10,
+  ]
+}
+resource "azurerm_subnet" "res-13" {
+  address_prefixes                              = ["10.0.1.0/24"]
+  default_outbound_access_enabled               = true
+  name                                          = "SSC-WEB"
+  private_endpoint_network_policies             = "Disabled"
+  private_link_service_network_policies_enabled = true
+  resource_group_name                           = "s1190828"
+  service_endpoint_policy_ids                   = []
+  service_endpoints                             = []
+  virtual_network_name                          = "IAC-vnet"
+  depends_on = [
+    azurerm_virtual_network.res-10,
+  ]
+}

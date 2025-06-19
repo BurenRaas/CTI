@@ -2,7 +2,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 4.0"
+      version = "4.24.0"
     }
   }
 }
@@ -17,9 +17,9 @@ data "azurerm_resource_group" "rg" {
   name = "s1190828"
 }
 
-#SSC-SUBNET
+#SSC-VNET
 resource "azurerm_virtual_network" "SSC-VNET" {
-  name                = "IAC-vnet"
+  name                = "SSC-vnet"
   address_space       = ["10.0.0.0/16"]
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -36,17 +36,51 @@ resource "azurerm_subnet" "SSC-WEB-SUBNET" {
   address_prefixes     = ["10.0.1.0/24"]
 }
 
+#ASG
 
-resource "azurerm_network_interface" "SSC-WEB-WEB" {
+resource "azurerm_application_security_group" "SSC-WEB-ASG" {
+  name                = "SSC-WEB-ASG"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+}
+
+#NSG
+resource "azurerm_network_security_group" "SSC-WEB-NSG" {
+  name                = "SSC-WEB-NSG"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+
+  security_rule {
+    name                       = "test123"
+    priority                   = 100
+    direction                  = "Inbound"
+    access                     = "Allow"
+    protocol                   = "Tcp"
+    source_port_range          = "*"
+    destination_port_range     = "*"
+    source_address_prefix      = "*"
+    destination_address_prefix = "*"
+    source_application_security_group_ids      = ["/subscriptions/7c2cf771-1067-4e56-9047-4a218905ddaf/resourceGroups/s1190828/providers/Microsoft.Network/applicationSecurityGroups/SSC-WEB-ASG"]
+  }
+}
+
+
+resource "azurerm_subnet_network_security_group_association" "SSC-WEB-ASSOC" {
+  subnet_id                 = azurerm_subnet.SSC-WEB-SUBNET.id
+  network_security_group_id = azurerm_network_security_group.SSC-WEB-NSG.id
+}
+
+
+resource "azurerm_network_interface" "SSC-WEB-NIC" {
   count               = 1
   name                = "SSC-WEB-NIC-${count.index}"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
 
   ip_configuration {
-    name                          = "internal"
-    subnet_id                     = azurerm_subnet.SSC-WEB-SUBNET.id
-    private_ip_address_allocation = "Dynamic"
+    name                            = "internal"
+    subnet_id                       = azurerm_subnet.SSC-WEB-SUBNET.id
+    private_ip_address_allocation   = "Dynamic"
   }
 }
 
@@ -60,7 +94,7 @@ resource "azurerm_linux_virtual_machine" "SSC-WEB-VM" {
   admin_password                  = "Welkom01!!"
   disable_password_authentication = false
 
-  network_interface_ids = [azurerm_network_interface.SSC-WEB-WEB[count.index].id]
+  network_interface_ids = [azurerm_network_interface.SSC-WEB-NIC[count.index].id]
 
   admin_ssh_key {
     username   = "student"
@@ -80,6 +114,9 @@ resource "azurerm_linux_virtual_machine" "SSC-WEB-VM" {
   }
 
 }
+
+
+
 
 ///////////
 
