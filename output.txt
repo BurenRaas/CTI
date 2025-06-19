@@ -1,0 +1,18 @@
+output "azure_vm_ips" {
+  value = [for ip in azurerm_public_ip.pip : ip.ip_address]
+}
+
+#Generate Ansible inventoryfile (IP, user & SSH key) voor webservers en voegt ips toe aan known_hosts voor SSH toegang.
+resource "null_resource" "generate_inventory_and_known_hosts" {
+  provisioner "local-exec" {
+    command = <<EOT
+echo "${azurerm_public_ip.pip[0].ip_address} ansible_user=student ansible_ssh_private_key_file=~/.ssh/iac" >> inventory.ini
+ssh-keyscan -H ${azurerm_public_ip.pip[0].ip_address} >> ~/.ssh/known_hosts
+EOT
+  }
+
+  depends_on = [
+     azurerm_linux_virtual_machine.SSC-WEB-VM,
+    azurerm_public_ip.pip
+  ]
+}
