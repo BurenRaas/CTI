@@ -69,7 +69,7 @@ resource "azurerm_subnet_network_security_group_association" "SSC-WEB-ASSOC" {
 
 #VM NIC
 resource "azurerm_network_interface" "SSC-WEB-NIC" {
-  count               = 1
+  count               = 2
   name                = "SSC-WEB-NIC-${count.index}"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -82,7 +82,7 @@ resource "azurerm_network_interface" "SSC-WEB-NIC" {
 }
 
 resource "azurerm_linux_virtual_machine" "SSC-WEB-VM" {
-  count                           = 1
+  count                           = 2
   name                            = "SSC-WEB-VM${count.index}"
   resource_group_name             = data.azurerm_resource_group.rg.name
   location                        = data.azurerm_resource_group.rg.location
@@ -92,6 +92,9 @@ resource "azurerm_linux_virtual_machine" "SSC-WEB-VM" {
   disable_password_authentication = false
 
   network_interface_ids = [azurerm_network_interface.SSC-WEB-NIC[count.index].id]
+
+    availability_set_id = azurerm_availability_set.SSC-WEB-AV.id
+
 
   admin_ssh_key {
     username   = "student"
@@ -159,7 +162,7 @@ resource "azurerm_subnet_network_security_group_association" "SSC-APP-ASSOC" {
 
 #VM NIC
 resource "azurerm_network_interface" "SSC-APP-NIC" {
-  count               = 1
+  count               = 0
   name                = "SSC-APP-NIC${count.index}"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -172,7 +175,7 @@ resource "azurerm_network_interface" "SSC-APP-NIC" {
 }
 
 resource "azurerm_linux_virtual_machine" "SSC-APP-VM" {
-  count                           = 1
+  count                           = 0
   name                            = "SSC-APP-VM${count.index}"
   resource_group_name             = data.azurerm_resource_group.rg.name
   location                        = data.azurerm_resource_group.rg.location
@@ -181,6 +184,8 @@ resource "azurerm_linux_virtual_machine" "SSC-APP-VM" {
   admin_password                  = "Welkom01!!"
   disable_password_authentication = false
   network_interface_ids = [azurerm_network_interface.SSC-APP-NIC[count.index].id]
+
+      availability_set_id = azurerm_availability_set.SSC-APP-AV.id
 
   admin_ssh_key {
     username   = "student"
@@ -245,7 +250,7 @@ resource "azurerm_lb_rule" "SSC-APP-LB_rule" {
 
 # Koppel app-NIC aan backend pool
 resource "azurerm_network_interface_backend_address_pool_association" "app_nic_lb" {
-  count                   = 1
+  count                   = 0
   network_interface_id    = azurerm_network_interface.SSC-APP-NIC[count.index].id
   ip_configuration_name   = "internal"
   backend_address_pool_id = azurerm_lb_backend_address_pool.app_pool.id
@@ -295,7 +300,7 @@ resource "azurerm_subnet_network_security_group_association" "SSC-DB-ASSOC" {
 
 #VM NIC
 resource "azurerm_network_interface" "SSC-DB-NIC" {
-  count               = 1
+  count               = 0
   name                = "SSC-DB-NIC${count.index}"
   location            = data.azurerm_resource_group.rg.location
   resource_group_name = data.azurerm_resource_group.rg.name
@@ -308,7 +313,7 @@ resource "azurerm_network_interface" "SSC-DB-NIC" {
 }
 
 resource "azurerm_linux_virtual_machine" "SSC-DB-VM" {
-  count                           = 1
+  count                           = 0
   name                            = "SSC-DB-VM${count.index}"
   resource_group_name             = data.azurerm_resource_group.rg.name
   location                        = data.azurerm_resource_group.rg.location
@@ -317,6 +322,8 @@ resource "azurerm_linux_virtual_machine" "SSC-DB-VM" {
   admin_password                  = "Welkom01!!"
   disable_password_authentication = false
   network_interface_ids = [azurerm_network_interface.SSC-DB-NIC[count.index].id]
+
+      availability_set_id = azurerm_availability_set.SSC-DB-AV.id
 
   admin_ssh_key {
     username   = "student"
@@ -377,7 +384,7 @@ resource "azurerm_lb_rule" "SSC-DB-LB_rule" {
 
 # Koppel DB-NIC aan backend pool
 resource "azurerm_network_interface_backend_address_pool_association" "DB_nic_lb" {
-  count                   = 1
+  count                   = 0
   network_interface_id    = azurerm_network_interface.SSC-DB-NIC[count.index].id
   ip_configuration_name   = "internal"
   backend_address_pool_id = azurerm_lb_backend_address_pool.DB_pool.id
@@ -510,5 +517,63 @@ resource "azurerm_availability_set" "SSC-DB-AV" {
   managed                      = true
   tags = {
     role = "db"
+  }
+}
+
+/////
+
+#Scaleset met een app service 
+
+resource "azurerm_service_plan" "woz_plan" {
+  name                = "asp-woz-taxaties"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+
+  os_type = "Linux"
+  sku_name = "S1"
+}
+
+resource "azurerm_app_service" "woz_app" {
+  name                = "woz-taxatie-app"
+  location            = data.azurerm_resource_group.rg.location
+  resource_group_name = data.azurerm_resource_group.rg.name
+  app_service_plan_id = azurerm_service_plan.woz_plan.id
+
+  site_config {
+    linux_fx_version = "NODE|18-lts"  # Voorbeeld
+  }
+}
+
+resource "azurerm_monitor_autoscale_setting" "woz_autoscale" {
+  name                = "woz-autoscale"
+  resource_group_name = data.azurerm_resource_group.rg.name
+  location            = data.azurerm_resource_group.rg.location
+  target_resource_id  = azurerm_service_plan.woz_plan.id
+  enabled             = true
+
+  profile {
+    name = "feb-maart-schaal"
+
+    fixed_date {
+      timezone = "W. Europe Standard Time"
+      start    = "2025-02-01T00:00:00Z"
+      end      = "2025-03-31T23:59:59Z"
+    }
+
+    capacity {
+      minimum = "4"
+      maximum = "4"
+      default = "4"
+    }
+  }
+
+  # Profiel buiten piekmaanden
+  profile {
+    name = "buiten-piek-maanden"
+    capacity {
+      minimum = "1"
+      maximum = "1"
+      default = "1"
+    }
   }
 }
