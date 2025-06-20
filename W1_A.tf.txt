@@ -1,0 +1,193 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=4.24.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+  subscription_id = "7c2cf771-1067-4e56-9047-4a218905ddaf"
+}
+
+# Resource Group
+resource "azurerm_resource_group" "rg" {
+  name     = "s1190828"
+  location = "westeurope"
+  tags     = {}
+}
+
+# Virtual Network
+resource "azurerm_virtual_network" "res-10" {
+  name                = "IAC-vnet"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  address_space       = ["10.0.0.0/16"]
+}
+
+# Subnet
+resource "azurerm_subnet" "res-13" {
+  name                                          = "SSC-WEB"
+  resource_group_name                           = azurerm_resource_group.rg.name
+  virtual_network_name                          = azurerm_virtual_network.res-10.name
+  address_prefixes                              = ["10.0.1.0/24"]
+  private_endpoint_network_policies             = "Disabled"
+  private_link_service_network_policies_enabled = true
+  default_outbound_access_enabled               = true
+  service_endpoints                             = []
+  service_endpoint_policy_ids                   = []
+
+  depends_on = [azurerm_virtual_network.res-10]
+}
+
+# Application Security Group
+resource "azurerm_application_security_group" "res-4" {
+  name                = "SSC-WEB-ASG"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tags                = {}
+
+  depends_on = [azurerm_resource_group.rg]
+}
+
+# Network Security Group
+resource "azurerm_network_security_group" "res-8" {
+  name                = "SSC-WEB-NSG"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  tags                = {}
+}
+
+# Network Security Rule
+resource "azurerm_network_security_rule" "res-9" {
+  name                                       = "AllowApplicationSecurityGroupCustom8080Inbound"
+  priority                                   = 100
+  direction                                  = "Inbound"
+  access                                     = "Allow"
+  protocol                                   = "Tcp"
+  source_port_range                          = "*"
+  destination_port_range                     = "8080"
+  source_application_security_group_ids      = [azurerm_application_security_group.res-4.id]
+  destination_application_security_group_ids = []
+  source_address_prefix                      = "*"
+  destination_address_prefix                 = "*"
+  resource_group_name                        = azurerm_resource_group.rg.name
+  network_security_group_name                = azurerm_network_security_group.res-8.name
+
+  depends_on = [
+    azurerm_application_security_group.res-4,
+    azurerm_network_security_group.res-8,
+  ]
+}
+
+# Network Interface for WEB
+resource "azurerm_network_interface" "res-7" {
+  name                = "SSC-WEB-NIC-0"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  ip_forwarding_enabled = false
+  tags                = {}
+
+  ip_configuration {
+    name                          = "internal"
+    primary                       = true
+    private_ip_address_allocation = "Dynamic"
+    private_ip_address_version    = "IPv4"
+    private_ip_address            = "10.0.1.4"
+    subnet_id                     = azurerm_subnet.res-13.id
+  }
+
+  depends_on = [azurerm_subnet.res-13]
+}
+
+# Linux VM: WEB
+resource "azurerm_linux_virtual_machine" "res-3" {
+  name                = "SSC-WEB-VM0"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  size                = "Standard_B2ats_v2"
+  admin_username      = "student"
+  admin_password      = "Welkom01!!"
+  disable_password_authentication = false
+  network_interface_ids = [azurerm_network_interface.res-7.id]
+
+  os_disk {
+    name                 = "SSC-WEB-VM0_OsDisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+    disk_size_gb         = 30
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "ubuntu-24_04-lts"
+    sku       = "server"
+    version   = "latest"
+  }
+
+  admin_ssh_key {
+    username   = "student"
+    public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL58jaxD3fXQPm5zm7KdRJ0vMFsC1a/BnCtDgspeCbwg student@s1190828-ubuntu\n"
+  }
+
+  provision_vm_agent = true
+
+  depends_on = [azurerm_network_interface.res-7]
+}
+
+# Network Interface for APP
+resource "azurerm_network_interface" "res-5" {
+  name                = "SSC-APP-NIC-0"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  ip_forwarding_enabled = false
+  tags                = {}
+
+  ip_configuration {
+    name                          = "internal"
+    primary                       = true
+    private_ip_address_allocation = "Dynamic"
+    private_ip_address_version    = "IPv4"
+    private_ip_address            = "10.0.1.5"
+    subnet_id                     = azurerm_subnet.res-13.id
+  }
+
+  depends_on = [azurerm_subnet.res-13]
+}
+
+# Linux VM: APP
+resource "azurerm_linux_virtual_machine" "res-1" {
+  name                = "SSC-APP-VM0"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  size                = "Standard_B2ats_v2"
+  admin_username      = "student"
+  admin_password      = "Welkom01!!"
+  disable_password_authentication = false
+  network_interface_ids = [azurerm_network_interface.res-5.id]
+
+  os_disk {
+    name                 = "SSC-APP-VM0_OsDisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+    disk_size_gb         = 30
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "ubuntu-24_04-lts"
+    sku       = "server"
+    version   = "latest"
+  }
+
+  admin_ssh_key {
+    username   = "student"
+    public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL58jaxD3fXQPm5zm7KdRJ0vMFsC1a/BnCtDgspeCbwg student@s1190828-ubuntu\n"
+  }
+
+  provision_vm_agent = true
+
+  depends_on = [azurerm_network_interface.res-5]
+}
