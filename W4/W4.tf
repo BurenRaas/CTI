@@ -22,12 +22,18 @@ resource "azurerm_resource_group" "rg" {
 
 #Hot blob storage
 resource "azurerm_storage_account" "website" {
-  name                     = "websitestorage"
+  name                     = "webstorages1190828"
   resource_group_name      = azurerm_resource_group.rg.name
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   access_tier              = "Hot"
   account_replication_type = "LRS"
+
+
+  static_website {
+    index_document     = "index.html"
+    error_404_document = "404error.html"
+  }
 }
 
 #Cold blob storage
@@ -48,7 +54,7 @@ resource "azurerm_storage_container" "pdfs" {
 
 #SQL storage
 resource "azurerm_mssql_server" "sql" {
-  name                         = "sqlcrmserver"
+  name                         = "sqlservers1190828"
   resource_group_name          = azurerm_resource_group.rg.name
   location                     = azurerm_resource_group.rg.location
   version                      = "12.0"
@@ -56,8 +62,8 @@ resource "azurerm_mssql_server" "sql" {
   administrator_login_password = "Welkom01!!"
 }
 
-resource "azurerm_mssql_database" "crm" {
-  name         = "crmdb"
+resource "azurerm_mssql_database" "db" {
+  name         = "db"
   server_id    = azurerm_mssql_server.sql.id
   collation    = "SQL_Latin1_General_CP1_CI_AS"
   license_type = "LicenseIncluded"
